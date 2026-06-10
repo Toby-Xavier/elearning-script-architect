@@ -32,37 +32,103 @@ function App() {
 		setError(null);
 	}
 
+	// 🎨 Crafto Theme - Minimal, clean, SaaS style
 	const styles = {
-		outer: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f3f4f6', padding: 24 },
-		card: { width: '100%', maxWidth: 800, background: '#fff', borderRadius: 12, padding: 20, boxShadow: '0 6px 24px rgba(15,23,42,0.06)' },
-		error: { color: '#dc2626', marginBottom: 12 },
-		footer: { marginTop: 12, display: 'flex', justifyContent: 'flex-end' },
-		startOver: { padding: '8px 12px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 700 },
+		outer: {
+			minHeight: '100vh',
+			background: '#f5f7fa',
+			padding: '60px 32px',
+			fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+		},
+		container: {
+			maxWidth: '1000px',
+			margin: '0 auto'
+		},
+		card: {
+			background: '#ffffff',
+			borderRadius: '20px',
+			border: '1px solid #eef2f6',
+			boxShadow: '0 1px 2px rgba(0,0,0,0.03), 0 8px 20px rgba(0,0,0,0.02)',
+			padding: '48px 56px',
+			transition: 'all 0.2s ease'
+		},
+		error: {
+			background: '#fef2f2',
+			border: '1px solid #fee2e2',
+			color: '#dc2626',
+			padding: '14px 18px',
+			borderRadius: '12px',
+			marginBottom: '28px',
+			fontSize: '0.875rem',
+			display: 'flex',
+			alignItems: 'center',
+			gap: '10px'
+		},
+		footer: {
+			marginTop: '36px',
+			display: 'flex',
+			justifyContent: 'flex-end',
+			borderTop: '1px solid #f0f2f5',
+			paddingTop: '24px'
+		},
+		startOver: {
+			padding: '8px 20px',
+			background: 'transparent',
+			color: '#5c6b7e',
+			border: '1px solid #e2e8f0',
+			borderRadius: '30px',
+			cursor: 'pointer',
+			fontWeight: '500',
+			fontSize: '0.875rem',
+			transition: 'all 0.2s ease',
+			fontFamily: 'inherit'
+		}
 	};
 
 	return (
 		<div style={styles.outer}>
-			<div style={styles.card}>
-				{error && <div style={styles.error}>{error}</div>}
-
-				{!result && !isLoading && (
-					<ScriptForm onSubmit={handleGenerate} isLoading={isLoading} />
-				)}
-
-				{isLoading && <LoadingIndicator />}
-
-				{result && (
-					<>
-						<ScriptDisplay result={result} />
-						<div style={styles.footer}>
-							<button onClick={handleStartOver} style={styles.startOver}>Start over</button>
+			<div style={styles.container}>
+				<div style={styles.card}>
+					{error && (
+						<div style={styles.error}>
+							<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+								<path d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 12H7v-2h1v2zm0-3H7V4h1v5z"/>
+							</svg>
+							{error}
 						</div>
-					</>
-				)}
+					)}
+
+					{!result && !isLoading && (
+						<ScriptForm onSubmit={handleGenerate} isLoading={isLoading} />
+					)}
+
+					{isLoading && <LoadingIndicator />}
+
+					{result && (
+						<>
+							<ScriptDisplay result={result} />
+							<div style={styles.footer}>
+								<button 
+									onClick={handleStartOver} 
+									style={styles.startOver}
+									onMouseEnter={(e) => {
+										e.target.style.background = '#f8fafc';
+										e.target.style.borderColor = '#cbd5e1';
+									}}
+									onMouseLeave={(e) => {
+										e.target.style.background = 'transparent';
+										e.target.style.borderColor = '#e2e8f0';
+									}}
+								>
+									← Start over
+								</button>
+							</div>
+						</>
+					)}
+				</div>
 			</div>
 		</div>
 	);
 }
 
 export default App;
-

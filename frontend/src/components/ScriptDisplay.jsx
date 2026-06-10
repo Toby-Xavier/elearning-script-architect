@@ -1,124 +1,159 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 function ScriptDisplay({ result }) {
-	const [copiedIndex, setCopiedIndex] = useState(null);
-
 	const styles = {
-		container: { maxWidth: 900, margin: '16px auto', padding: 12, fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial' },
-		header: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
-		title: { fontSize: 20, fontWeight: 700, color: '#111827' },
-		button: { padding: '8px 12px', borderRadius: 8, border: 'none', background: '#111827', color: '#fff', cursor: 'pointer', fontWeight: 600 },
-		grid: { display: 'grid', gridTemplateColumns: '1fr', gap: 12 },
-		card: { padding: 12, borderRadius: 8, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', background: '#fff', border: '1px solid #e5e7eb' },
-		cardHeading: { fontSize: 16, fontWeight: 700, marginBottom: 8, color: '#0f172a' },
-		scriptBox: { maxHeight: 250, overflowY: 'auto', padding: 10, borderRadius: 6, background: '#f9fafb', border: '1px solid #e5e7eb', whiteSpace: 'pre-wrap', fontSize: 14, color: '#111827' },
-		cardFooter: { display: 'flex', justifyContent: 'flex-end', marginTop: 8 },
-		copyButton: { padding: '6px 10px', borderRadius: 6, border: 'none', background: '#067dff', color: '#fff', cursor: 'pointer', fontWeight: 600, transition: 'transform 160ms ease, background 160ms ease' },
-		copyWrap: { position: 'relative', display: 'inline-flex', alignItems: 'center' },
-		copyBadge: { position: 'absolute', right: '100%', marginRight: 8, top: '50%', transform: 'translateY(-50%) translateY(-6px)', background: '#10b981', color: '#fff', padding: '6px 8px', borderRadius: 6, fontSize: 13, fontWeight: 700, opacity: 0, pointerEvents: 'none', transition: 'opacity 220ms ease, transform 220ms ease' },
-		disabled: { opacity: 0.6, cursor: 'not-allowed' },
+		container: {
+			animation: 'fadeIn 0.3s ease-out'
+		},
+		header: {
+			marginBottom: '24px'
+		},
+		title: {
+			fontSize: '1.25rem',
+			fontWeight: '600',
+			color: '#111827',
+			marginBottom: '8px'
+		},
+		content: {
+			background: '#fafbfc',
+			borderRadius: '16px',
+			padding: '28px',
+			border: '1px solid #f0f2f5',
+			fontFamily: "'Inter', sans-serif",
+			fontSize: '0.95rem',
+			lineHeight: '1.55',
+			color: '#374151',
+			whiteSpace: 'pre-wrap',
+			maxHeight: '600px',
+			overflowY: 'auto'
+		},
+		concept: {
+			padding: '6px 0',
+			marginBottom: 8,
+			borderBottom: '1px solid rgba(15,23,42,0.04)'
+		},
+		conceptLast: {
+			padding: '6px 0',
+			marginBottom: 6
+		},
+		meta: {
+			display: 'flex',
+			alignItems: 'center',
+			gap: '12px',
+			marginTop: '16px',
+			paddingTop: '16px',
+			borderTop: '1px solid #f0f2f5'
+		},
+		badge: {
+			background: '#f3f4f6',
+			color: '#4b5563',
+			padding: '4px 12px',
+			borderRadius: '20px',
+			fontSize: '0.75rem',
+			fontWeight: '500'
+		},
+		downloadBtn: {
+			background: 'transparent',
+			border: '1px solid #e5e7eb',
+			padding: '6px 16px',
+			borderRadius: '20px',
+			fontSize: '0.8rem',
+			cursor: 'pointer',
+			color: '#4b5563',
+			fontWeight: '500',
+			transition: 'all 0.2s ease',
+			fontFamily: 'inherit'
+		}
 	};
 
-	function handleCopy(script, idx) {
-		if (!script) return;
-		const tryClipboard = async () => {
-			try {
-				if (navigator.clipboard && navigator.clipboard.writeText) {
-					await navigator.clipboard.writeText(script);
-				} else {
-					// Fallback
-					const ta = document.createElement('textarea');
-					ta.value = script;
-					document.body.appendChild(ta);
-					ta.select();
-					document.execCommand('copy');
-					document.body.removeChild(ta);
-				}
-
-				setCopiedIndex(idx);
-				setTimeout(() => setCopiedIndex(null), 1800);
-			} catch (err) {
-				// ignore clipboard errors silently
-				console.error('Copy failed', err);
-			}
-		};
-
-		tryClipboard();
-	}
-
-	function handleDownloadAll() {
-		if (!result) return;
-		const parts = [];
-		parts.push(result.course_title ? `Course Title: ${result.course_title}` : 'Course Title:');
-		parts.push('');
-
-		(result.modules || []).forEach((m) => {
-			parts.push(`Module ${m.module_number} - ${m.title}`);
-			parts.push('');
-			parts.push(m.script || '');
-			parts.push('\n---\n');
-		});
-
-		const blob = new Blob([parts.join('\n')], { type: 'text/plain;charset=utf-8' });
+	const handleDownload = () => {
+		const content = typeof result === 'string' ? result : JSON.stringify(result, null, 2);
+		const blob = new Blob([content], { type: 'text/plain' });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
-		const safeTitle = (result.course_title || 'course').replace(/[^a-z0-9\- _]/gi, '_');
 		a.href = url;
-		a.download = `${safeTitle}.txt`;
+		a.download = 'elearning-script.txt';
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
 		URL.revokeObjectURL(url);
-	}
+	};
 
-	if (!result) {
-		return (
-			<div style={styles.container}>
-				<div style={styles.header}>
-					<div style={styles.title}>No script available</div>
-				</div>
-			</div>
-		);
-	}
+	// Add fadeIn animation
+	const animationStyle = document.createElement('style');
+	animationStyle.textContent = `
+		@keyframes fadeIn {
+			from { opacity: 0; transform: translateY(10px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+	`;
+	document.head.appendChild(animationStyle);
 
 	return (
 		<div style={styles.container}>
 			<div style={styles.header}>
-				<div style={styles.title}>{result.course_title || 'Untitled Course'}</div>
-				<div>
-					<button onClick={handleDownloadAll} style={styles.button} aria-label="Download all as text">Download all as .txt</button>
-				</div>
+				<h3 style={styles.title}>Your generated script</h3>
 			</div>
+			<div style={styles.content}>
+				{(() => {
+					// Helper to split text into concept blocks by blank lines
+					const splitIntoConcepts = (text) => {
+						if (!text) return [];
+						return String(text)
+							.split(/\n\s*\n+/g)
+							.map(s => s.trim())
+							.filter(Boolean);
+					};
 
-			<div style={styles.grid}>
-				{(result.modules || []).map((m, idx) => (
-					<div key={m.module_number ?? idx} style={styles.card}>
-						<div style={styles.cardHeading}>Module {m.module_number}: {m.title}</div>
-						<div style={styles.scriptBox}>
-							{m.script || ''}
-						</div>
-						<div style={styles.cardFooter}>
-							<div style={styles.copyWrap}>
-								<span
-									style={copiedIndex === idx ? { ...styles.copyBadge, opacity: 1, transform: 'translateY(-50%) translateY(0)' } : styles.copyBadge}
-								>
-									Copied
-								</span>
-								<button
-									onClick={() => handleCopy(m.script || '', idx)}
-									style={copiedIndex === idx ? { ...styles.copyButton, transform: 'scale(1.03)', background: '#0ea5a4' } : styles.copyButton}
-									aria-label={`Copy module ${m.module_number} script`}
-								>
-									{copiedIndex === idx ? 'Copied' : 'Copy module'}
-								</button>
+					if (typeof result === 'string') {
+						const concepts = splitIntoConcepts(result);
+						return concepts.map((c, i) => (
+							<div key={i} style={i === concepts.length - 1 ? styles.conceptLast : styles.concept}>
+								<div style={{ whiteSpace: 'pre-wrap' }}>{c}</div>
 							</div>
-						</div>
-					</div>
-				))}
+						));
+					}
+
+					// If result looks like an object with modules, render each module and its concepts
+					if (result && typeof result === 'object' && Array.isArray(result.modules)) {
+						return result.modules.map((m, mi) => {
+							const concepts = splitIntoConcepts(m.script || '');
+							return (
+								<div key={mi} style={{ marginBottom: 12 }}>
+									<div style={{ fontWeight: 700, marginBottom: 8 }}>Module {m.module_number}: {m.title}</div>
+									{concepts.map((c, i) => (
+										<div key={i} style={i === concepts.length - 1 ? styles.conceptLast : styles.concept}>
+											<div style={{ whiteSpace: 'pre-wrap' }}>{c}</div>
+										</div>
+									))}
+								</div>
+							);
+						});
+					}
+
+					// Fallback: pretty-print JSON
+					return <pre style={{ margin: 0 }}>{JSON.stringify(result, null, 2)}</pre>;
+				})()}
+			</div>
+			<div style={styles.meta}>
+				<span style={styles.badge}>AI Generated</span>
+				<button 
+					style={styles.downloadBtn}
+					onClick={handleDownload}
+					onMouseEnter={(e) => {
+						e.target.style.background = '#f9fafb';
+						e.target.style.borderColor = '#d1d5db';
+					}}
+					onMouseLeave={(e) => {
+						e.target.style.background = 'transparent';
+						e.target.style.borderColor = '#e5e7eb';
+					}}
+				>
+					Download script ↓
+				</button>
 			</div>
 		</div>
 	);
 }
 
 export default ScriptDisplay;
-

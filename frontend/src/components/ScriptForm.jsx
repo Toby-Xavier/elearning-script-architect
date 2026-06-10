@@ -1,126 +1,213 @@
 import React, { useState } from 'react';
 
-function ScriptForm({ onSubmit, isLoading = false }) {
-	const [topic, setTopic] = useState('');
-	const [objectivesText, setObjectivesText] = useState('');
-	const [level, setLevel] = useState('Beginner');
-	const [numModules, setNumModules] = useState(1);
+function ScriptForm({ onSubmit, isLoading }) {
+	const [formData, setFormData] = useState({
+		title: '',
+		objectives: '',
+		audienceLevel: 'Beginner',
+		numModules: 3
+	});
 
-	const styles = {
-		form: {
-			maxWidth: 640,
-			margin: '0 auto',
-			padding: 16,
-			borderRadius: 8,
-			background: '#fff',
-			boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-			fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial',
-		},
-		field: { display: 'flex', flexDirection: 'column', marginBottom: 12 },
-		label: { marginBottom: 6, fontSize: 14, fontWeight: 600, color: '#111827' },
-		input: { padding: '8px 10px', fontSize: 14, borderRadius: 6, border: '1px solid #d1d5db' },
-		textarea: { padding: 10, fontSize: 14, borderRadius: 6, border: '1px solid #d1d5db', resize: 'vertical' },
-		select: { padding: 8, fontSize: 14, borderRadius: 6, border: '1px solid #d1d5db' },
-		number: { width: 120, padding: 8, fontSize: 14, borderRadius: 6, border: '1px solid #d1d5db' },
-		button: {
-			marginTop: 8,
-			padding: '10px 14px',
-			background: '#111827',
-			color: '#fff',
-			border: 'none',
-			borderRadius: 8,
-			cursor: 'pointer',
-			fontWeight: 600,
-		},
-		buttonDisabled: {
-			background: '#9ca3af',
-			cursor: 'not-allowed',
-		},
-		hint: { marginTop: 4, fontSize: 12, color: '#6b7280' },
+	const handleChange = (e) => {
+		const { name, value } = e.target;
+		setFormData(prev => ({ ...prev, [name]: value }));
 	};
 
-	function handleSubmit(e) {
+	const handleSubmit = (e) => {
 		e.preventDefault();
-		if (typeof onSubmit !== 'function') return;
+		onSubmit(formData);
+	};
 
-		const data = {
-			topic: topic.trim(),
-			// Split objectives by line, trim and drop empty lines
-			objectives: objectivesText
-				.split('\n')
-				.map((s) => s.trim())
-				.filter(Boolean),
-			level,
-			numModules: Number(numModules) || 1,
-		};
+	const styles = {
+		container: {
+			width: '100%'
+		},
+		header: {
+			textAlign: 'center',
+			marginBottom: '48px'
+		},
+		logo: {
+			display: 'inline-block',
+			fontSize: '2.5rem',
+			marginBottom: '16px'
+		},
+		title: {
+			fontSize: '2.5rem',
+			fontWeight: '700',
+			color: '#111827',
+			marginBottom: '12px',
+			letterSpacing: '-0.02em'
+		},
+		subtitle: {
+			color: '#6b7280',
+			fontSize: '1.1rem',
+			lineHeight: '1.5',
+			maxWidth: '500px',
+			margin: '0 auto'
+		},
+		form: {
+			display: 'flex',
+			flexDirection: 'column',
+			gap: '24px'
+		},
+		field: {
+			display: 'flex',
+			flexDirection: 'column',
+			gap: '8px'
+		},
+		label: {
+			fontWeight: '600',
+			color: '#374151',
+			fontSize: '0.9rem',
+			marginBottom: '4px'
+		},
+		input: {
+			width: '100%',
+			padding: '14px 16px',
+			border: '1.5px solid #e9eef3',
+			borderRadius: '12px',
+			fontSize: '1rem',
+			transition: 'all 0.2s ease',
+			fontFamily: 'inherit',
+			outline: 'none',
+			background: '#ffffff',
+			color: '#111827'
+		},
+		select: {
+			padding: '14px 16px',
+			border: '1.5px solid #e9eef3',
+			borderRadius: '12px',
+			fontSize: '1rem',
+			transition: 'all 0.2s ease',
+			fontFamily: 'inherit',
+			outline: 'none',
+			background: '#ffffff',
+			color: '#111827',
+			cursor: 'pointer'
+		},
+		button: {
+			background: '#111827',
+			color: '#ffffff',
+			padding: '14px 28px',
+			border: 'none',
+			borderRadius: '40px',
+			fontSize: '1rem',
+			fontWeight: '500',
+			cursor: isLoading ? 'not-allowed' : 'pointer',
+			opacity: isLoading ? 0.6 : 1,
+			transition: 'all 0.2s ease',
+			marginTop: '8px',
+			fontFamily: 'inherit'
+		},
+		row: {
+			display: 'grid',
+			gridTemplateColumns: '1fr 1fr',
+			gap: '20px'
+		},
+		helperText: {
+			fontSize: '0.8rem',
+			color: '#9ca3af',
+			marginTop: '4px'
+		}
+	};
 
-		onSubmit(data);
-	}
+	// Focus styles via style injection
+	const focusStyles = document.createElement('style');
+	focusStyles.textContent = `
+		input:focus, select:focus, textarea:focus {
+			border-color: #111827 !important;
+			box-shadow: 0 0 0 3px rgba(17,24,39,0.05) !important;
+		}
+		input:hover:not(:focus), select:hover:not(:focus), textarea:hover:not(:focus) {
+			border-color: #d1d5db !important;
+		}
+	`;
+	document.head.appendChild(focusStyles);
 
 	return (
-		<form onSubmit={handleSubmit} style={styles.form} aria-label="Script generation form">
-			<div style={styles.field}>
-				<label htmlFor="topic" style={styles.label}>Course Topic</label>
-				<input
-					id="topic"
-					name="topic"
-					type="text"
-					value={topic}
-					onChange={(e) => setTopic(e.target.value)}
-					style={styles.input}
-					required
-				/>
+		<div style={styles.container}>
+			<div style={styles.header}>
+				<h1 style={styles.title}>CreateScript</h1>
+				<p style={styles.subtitle}>Create structured eLearning scripts in minutes</p>
 			</div>
 
-			<div style={styles.field}>
-				<label htmlFor="objectives" style={styles.label}>Learning Objectives (one per line)</label>
-				<textarea
-					id="objectives"
-					name="objectives"
-					rows={4}
-					value={objectivesText}
-					onChange={(e) => setObjectivesText(e.target.value)}
-					style={styles.textarea}
-					placeholder="e.g. Understand X\nBe able to do Y"
-				/>
-				<div style={styles.hint}>Put each objective on its own line; empty lines are ignored.</div>
-			</div>
-
-			<div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-				<div style={{ ...styles.field, flex: 1 }}>
-					<label htmlFor="level" style={styles.label}>Level</label>
-					<select id="level" name="level" value={level} onChange={(e) => setLevel(e.target.value)} style={styles.select}>
-						<option>Beginner</option>
-						<option>Intermediate</option>
-						<option>Advanced</option>
-					</select>
-				</div>
-
-				<div style={{ ...styles.field, width: 160 }}>
-					<label htmlFor="numModules" style={styles.label}>Number of Modules</label>
+			<form onSubmit={handleSubmit} style={styles.form}>
+				<div style={styles.field}>
+					<label style={styles.label}>Course title</label>
 					<input
-						id="numModules"
-						name="numModules"
-						type="number"
-						min={1}
-						max={8}
-						value={numModules}
-						onChange={(e) => setNumModules(Math.max(1, Math.min(8, Number(e.target.value || 1))))}
-						style={styles.number}
+						type="text"
+						name="title"
+						value={formData.title}
+						onChange={handleChange}
+						placeholder="e.g., Mastering Public Speaking"
+						required
+						style={styles.input}
 					/>
 				</div>
-			</div>
 
-			<button
-				type="submit"
-				disabled={isLoading}
-				style={isLoading ? { ...styles.button, ...styles.buttonDisabled } : styles.button}
-			>
-				{isLoading ? 'Generating...' : 'Generate Script'}
-			</button>
-		</form>
+				<div style={styles.field}>
+					<label style={styles.label}>Learning objective(s)</label>
+					<textarea
+						name="objectives"
+						rows={4}
+						value={formData.objectives}
+						onChange={handleChange}
+						placeholder={`One objective per line\ne.g. Describe X\nApply Y in context`}
+						required
+						style={styles.input}
+					/>
+					<div style={styles.helperText}>Enter one learning objective per line.</div>
+				</div>
+
+				<div style={styles.row}>
+					<div style={styles.field}>
+						<label style={styles.label}>Audience level</label>
+						<select
+							name="audienceLevel"
+							value={formData.audienceLevel}
+							onChange={handleChange}
+							style={styles.select}
+						>
+							<option value="Beginner">Beginner</option>
+							<option value="Intermediate">Intermediate</option>
+							<option value="Advanced">Advanced</option>
+						</select>
+					</div>
+
+					<div style={styles.field}>
+						<label style={styles.label}>Number of modules</label>
+						<input
+							type="number"
+							name="numModules"
+							value={formData.numModules}
+							onChange={handleChange}
+							min="1"
+							max="12"
+							required
+							style={styles.input}
+						/>
+						<div style={styles.helperText}>Between 1-12 modules</div>
+					</div>
+				</div>
+
+				<button
+					type="submit"
+					disabled={isLoading}
+					style={styles.button}
+					onMouseEnter={(e) => {
+						e.target.style.background = '#1f2937';
+						e.target.style.transform = 'translateY(-1px)';
+					}}
+					onMouseLeave={(e) => {
+						e.target.style.background = '#111827';
+						e.target.style.transform = 'translateY(0)';
+					}}
+				>
+					{isLoading ? 'Generating...' : 'Generate script →'}
+				</button>
+			</form>
+		</div>
 	);
 }
 
 export default ScriptForm;
-

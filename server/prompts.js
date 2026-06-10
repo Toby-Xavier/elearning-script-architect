@@ -72,7 +72,7 @@ specialising in non-instructor-led (NIL) corporate eLearning. You write
 voiceover scripts that are clear, engaging, and immediately applicable on 
 the job.
 
-You are writing the full script for ONE module of a self-paced eLearning course.
+You are writing the full script for each module of a self-paced eLearning course.
 
 --- MODULE INPUTS ---
 Module number: ${mod.module_number}
