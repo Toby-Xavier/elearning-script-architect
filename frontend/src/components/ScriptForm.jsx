@@ -4,6 +4,7 @@ function ScriptForm({ onSubmit, isLoading }) {
 	const [formData, setFormData] = useState({
 		title: '',
 		objectives: '',
+		additionalInfo: '',
 		audienceLevel: 'Beginner',
 		numModules: 3
 	});
@@ -190,6 +191,18 @@ function ScriptForm({ onSubmit, isLoading }) {
 					</div>
 				</div>
 
+				<div style={styles.field}>
+					<label style={styles.label}>Additional information (optional)</label>
+					<textarea
+						name="additionalInfo"
+						rows={3}
+						value={formData.additionalInfo}
+						onChange={handleChange}
+						placeholder="Any extra context, constraints, or audience details"
+						style={styles.input}
+					/>
+				</div>
+
 				<button
 					type="submit"
 					disabled={isLoading}
@@ -203,7 +216,7 @@ function ScriptForm({ onSubmit, isLoading }) {
 						e.target.style.transform = 'translateY(0)';
 					}}
 				>
-					{isLoading ? 'Generating...' : 'Generate script →'}
+					{isLoading ? 'Generating...' : 'Generate script'}
 				</button>
 			</form>
 		</div>
