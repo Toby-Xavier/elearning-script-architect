@@ -27,17 +27,20 @@ function LoadingIndicator() {
 			gap: 12,
 			padding: 12,
 			fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial',
-			color: '#111827',
+			color: '#ffffff', // White text for contrast on dark background
 		},
 		spinner: {
 			width: 20,
 			height: 20,
 			borderRadius: '50%',
-			border: '3px solid rgba(0,0,0,0.08)',
-			borderTopColor: '#111827',
+			border: '3px solid rgba(255, 255, 255, 0.2)', // Light transparent border
+			borderTopColor: '#AC8968', // Soft camel from the palette
 			animation: 'rotateSpinner 1s linear infinite',
 		},
-		message: { fontSize: 14 },
+		message: { 
+			fontSize: 14,
+			color: '#ffffff',
+		},
 	};
 
 	return (
@@ -50,4 +53,3 @@ function LoadingIndicator() {
 }
 
 export default LoadingIndicator;
-
