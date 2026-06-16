@@ -81,7 +81,5 @@ POST /generate
 - Improve accessibility and responsive layout by extracting styles to CSS/SCSS and adding ARIA attributes.
 
 ## Contributing
-Contributions, issues, and suggestions are welcome. For major changes, please open an issue first to discuss.
+Contributions, issues, and suggestions are definitely welcome. For major changes though, please open an issue first to discuss.
 
-## License
-Include your preferred license here (e.g., MIT, GPL-3.0, etc.).
