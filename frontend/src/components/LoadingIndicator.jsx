@@ -21,33 +21,48 @@ function LoadingIndicator() {
 	const keyframes = `@keyframes rotateSpinner { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`;
 
 	const styles = {
-		container: {
+		wrapper: {
+			position: 'fixed',
+			top: 0,
+			left: 0,
+			right: 0,
+			bottom: 0,
 			display: 'flex',
 			alignItems: 'center',
-			gap: 12,
-			padding: 12,
+			justifyContent: 'center',
+			background: '#3E362E', // Deep warm brown background
+			zIndex: 1000,
+		},
+		container: {
+			display: 'flex',
+			flexDirection: 'column',
+			alignItems: 'center',
+			gap: 16,
+			padding: 24,
 			fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial',
-			color: '#ffffff', // White text for contrast on dark background
 		},
 		spinner: {
-			width: 20,
-			height: 20,
+			width: 40,
+			height: 40,
 			borderRadius: '50%',
-			border: '3px solid rgba(255, 255, 255, 0.2)', // Light transparent border
-			borderTopColor: '#AC8968', // Soft camel from the palette
+			border: '3px solid rgba(172, 137, 104, 0.2)', // #AC8968 with transparency
+			borderTopColor: '#AC8968', // Soft camel
 			animation: 'rotateSpinner 1s linear infinite',
 		},
 		message: { 
-			fontSize: 14,
-			color: '#ffffff',
+			fontSize: 16,
+			color: '#AC8968', // Soft camel text
+			fontWeight: 500,
 		},
 	};
 
 	return (
-		<div style={styles.container} role="status" aria-live="polite">
+		<div style={styles.wrapper} role="status" aria-live="polite">
 			<style>{keyframes}</style>
-			<div style={styles.spinner} aria-hidden="true" />
-			<div style={styles.message}>{MESSAGES[index]}</div>
+			<div style={styles.container}>
+				<div style={styles.spinner} aria-hidden="true" />
+				<div style={styles.message}>{MESSAGES[index]}</div>
+			</div>
 		</div>
 	);
 }

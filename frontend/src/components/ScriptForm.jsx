@@ -5,6 +5,8 @@ function ScriptForm({ onSubmit, isLoading }) {
 		title: '',
 		objectives: '',
 		additionalInfo: '',
+		// Optional: user-provided module breakdown (one per line).
+		moduleBreakdown: '',
 		audienceLevel: 'Beginner',
 		numModules: 3
 	});
@@ -154,9 +156,17 @@ function ScriptForm({ onSubmit, isLoading }) {
 			fontFamily: 'inherit',
 			outline: 'none',
 			background: '#ffffff',
+			backgroundImage: 'none',
 			color: '#3E362E',
 			cursor: 'pointer',
-			boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+			/* remove the darker-looking pre-click shade */
+			boxShadow: 'none',
+			/* remove native OS styling that can add gradients/shading */
+			appearance: 'none',
+			WebkitAppearance: 'none',
+			MozAppearance: 'none',
+			/* ensure dropdown arrow has space if you add a custom one later */
+			paddingRight: '36px',
 		},
 		button: {
 			background: 'linear-gradient(135deg, #865D36 0%, #3E362E 100%)',
@@ -303,6 +313,24 @@ function ScriptForm({ onSubmit, isLoading }) {
 								onBlur={() => setFocusedField(null)}
 								placeholder="Any specific requirements, audience insights, or constraints you'd like us to consider..."
 								style={getInputStyle('additionalInfo')}
+							/>
+						</div>
+
+						{/* Module breakdown (optional) */}
+						<div style={styles.field} className="form-group">
+							<label style={styles.label}>
+								<span>Module breakdown (optional)</span>
+								<span style={styles.inlineHint}>(One module per line — titles or brief descriptions)</span>
+							</label>
+							<textarea
+								name="moduleBreakdown"
+								rows={4}
+								value={formData.moduleBreakdown}
+								onChange={handleChange}
+								onFocus={() => setFocusedField('moduleBreakdown')}
+								onBlur={() => setFocusedField(null)}
+								placeholder="Module 1: Introduction — key topics to cover&#10;Module 2: Basics — ..."
+								style={getInputStyle('moduleBreakdown')}
 							/>
 						</div>
 
