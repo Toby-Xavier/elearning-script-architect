@@ -1,4 +1,4 @@
-# CreateScript — eLearning Script Architect
+# CreateScript: An eLearning Script Architect
 
 CreateScript is a small full‑stack prototype that helps instructional designers, subject matter experts, and course creators generate structured eLearning scripts from simple inputs. It combines a React frontend (Vite) with a lightweight Node/Express backend that prepares prompts for an AI/agent to produce module scripts.
 
