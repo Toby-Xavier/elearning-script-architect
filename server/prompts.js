@@ -65,7 +65,6 @@ backticks, no trailing text. The JSON must match this exact structure:
 }`;
 }
 
-
 export function buildScriptPrompt(mod, level) {
   return `You are a senior eLearning scriptwriter and instructional designer 
 specialising in non-instructor-led (NIL) corporate eLearning. You write 
@@ -177,4 +176,61 @@ great job or well done.
   sentences. Natural rhythm. Read it aloud before finalising.
 - Use second person (you, your) throughout to address the learner directly.
 - Tone: expert peer, not lecturer. Knowledgeable but conversational.`;
+}
+
+export function buildPrompt({ title, objectives, additionalInfo, audienceLevel, numModules, moduleBreakdown }) {
+  // Base metadata
+  let prompt = `You are an expert instructional designer. Create a detailed eLearning course script.\n\n`;
+  prompt += `Course title: ${title}\n`;
+  prompt += `Audience level: ${audienceLevel}\n`;
+  prompt += `Learning objectives (one per line):\n${objectives}\n\n`;
+  if (additionalInfo && additionalInfo.trim()) {
+    prompt += `Additional context:\n${additionalInfo}\n\n`;
+  }
+
+  // Prepare a strict modules_input JSON that preserves exact titles
+  let modulesInput = [];
+  if (moduleBreakdown && moduleBreakdown.trim()) {
+    const lines = moduleBreakdown
+      .split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(Boolean);
+
+    // Parse each line into title + optional guidance (split on "—" or ":" or " - ")
+    lines.forEach((line, i) => {
+      let titlePart = line;
+      let guidancePart = '';
+      // split on common dash characters or colon — use alternation to avoid char-class range errors
+      const splitMatch = line.split(/\s+(?:—|–|-|:)\s+/, 2);
+      if (splitMatch.length === 2) {
+        titlePart = splitMatch[0].trim();
+        guidancePart = splitMatch[1].trim();
+      }
+      modulesInput.push({
+        module_number: i + 1,
+        title: titlePart,
+        guidance: guidancePart
+      });
+    });
+
+    // Inject the structured modules_input for the model to reference
+    prompt += `User-provided module breakdown (STRICT - do not modify titles). The agent must use these titles EXACTLY as the "title" field in the output JSON. Any trailing guidance after the title should only inform the script content, never replace or alter the title.\n\n`;
+    prompt += `modules_input = ${JSON.stringify(modulesInput, null, 2)}\n\n`;
+
+    prompt += `CRITICAL INSTRUCTIONS WHEN modules_input IS PRESENT:\n`;
+    prompt += `- Use the module titles exactly as provided in modules_input[*].title. Do NOT rename, rephrase, change capitalization, punctuation, merge, split or reorder these titles.\n`;
+    prompt += `- If modules_input[*].guidance is non-empty, use it only as background guidance for the script content for that module. Do NOT use guidance as the module title.\n`;
+    prompt += `- Generate one script section for each entry in modules_input, in the same order. Ignore the 'Number of modules' value if it conflicts with the provided breakdown; follow modules_input length instead.\n\n`;
+  } else {
+    // No breakdown — instruct agent to generate modules based on numModules
+    prompt += `Instruction: Create ${numModules} modules (give each a clear title and a detailed script) that together satisfy the learning objectives above.\n\n`;
+  }
+
+  // Output format guidance (enforce exact title usage)
+  prompt += `OUTPUT FORMAT: Return ONLY valid JSON (no explanation). The JSON must match this exact structure and must set each module.title exactly equal to the corresponding modules_input.title when modules_input was provided.\n\n`;
+  prompt += `{\n  "course_title": "<course title>",\n  "modules": [\n    { "module_number": 1, "title": "<module title - EXACT match to modules_input.title when provided>", "script": "<full script text>" }\n    ...\n  ]\n}\n\n`;
+  prompt += `When modules_input is provided: the "title" field in the output MUST be identical (character-for-character) to the corresponding modules_input.title. If you believe a suggested alternative title is useful, include it only in an extra field 'suggested_title' but still set 'title' to the exact input. Do not produce any text outside the JSON.\n\n`;
+  prompt += `Be concise in titles and verbose in scripts. Do not include any extra commentary outside the JSON.\n`;
+
+  return prompt;
 }

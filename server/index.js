@@ -13,18 +13,30 @@ app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
+const model = genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite' });
+
+async function callModel(prompt) {
+  const result = await model.generateContent(prompt);
+  const content = result.response.text();
+
+  if (!content) {
+    console.error('Full API response:', JSON.stringify(result, null, 2));
+    throw new Error('Model returned an empty response. Try generating again.');
+  }
+
+  return content;
+}
 
 app.post('/generate', async (req, res) => {
   const { topic, objectives, level, numModules, audience } = req.body;
 
   try {
     // Step 1 — Generate course outline
-    const outlineResult = await model.generateContent(
+    let outlineText = await callModel(
       buildOutlinePrompt(topic, objectives, level, numModules, audience)
     );
 
-    let outlineText = outlineResult.response.text().trim();
+    outlineText = outlineText.trim();
 
     // Strip markdown fences if Gemini adds them
     if (outlineText.startsWith('```')) {
@@ -39,12 +51,10 @@ app.post('/generate', async (req, res) => {
     // Step 2 — Generate full script for each module
     const modulesWithScripts = await Promise.all(
       outline.modules.map(async (mod) => {
-        const scriptResult = await model.generateContent(
-          buildScriptPrompt(mod, level)
-        );
+        const scriptText = await callModel(buildScriptPrompt(mod, level));
         return {
           ...mod,
-          script: scriptResult.response.text().trim()
+          script: scriptText.trim()
         };
       })
     );
